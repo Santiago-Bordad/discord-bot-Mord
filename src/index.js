@@ -1,4 +1,4 @@
-const { Client, Collection, Events, GatewayIntentBits } = require("discord.js"); // trae el cliente (el bot), los nombres de los eventos y los intents
+const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require("discord.js"); // trae el cliente (el bot), los nombres de los eventos y los intents
 const ping = require("./commands/utiles/ping"); // importa el comando ping
 process.loadEnvFile(); // carga las variables desde el archivo .env
 const info = require("./commands/utiles/info"); // importa el comando info
@@ -56,12 +56,27 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const comando = interaction.client.commands.get(interaction.commandName); // busca el comando en la agenda
 
-    if (!comando) { // si no lo encuentra...
-        console.error(`No se encontró el comando ${interaction.commandName}`);
+    if (!comando) {
+        console.error(`No existe un comando llamado "${interaction.commandName}"`);
         return;
     }
 
-    await comando.execute(interaction); // ejecuta el comando
+    try {
+        await comando.execute(interaction); // intenta ejecutar el comando
+    } catch (error) { // si algo falló adentro del comando, se viene acá
+        console.error(`Error en /${interaction.commandName}:`, error); // para vos, en la terminal
+
+        const mensajeError = { // el aviso para el usuario
+            content: "Hubo un error al ejecutar este comando.",
+            flags: MessageFlags.Ephemeral, // solo lo ve quien usó el comando
+        };
+
+        if (interaction.replied || interaction.deferred) { // si el comando ya había respondido...
+            await interaction.followUp(mensajeError); // ...se manda como un mensaje más
+        } else {
+            await interaction.reply(mensajeError); // si no, como la respuesta
+        }
+    }
 });
 
 client.login(process.env.DISCORD_TOKEN); // se conecta a Discord con el token, desde acá el bot queda prendido
