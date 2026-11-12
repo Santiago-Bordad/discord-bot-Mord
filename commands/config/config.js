@@ -6,86 +6,57 @@ const { embedExito, embedInfo } = require('../../utils/embeds');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('config')
-        .setDescription('configuracion del bot en este servidor')
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-
-        // subcomando: /config canal
-        .addSubcommand((sub) =>
-            sub
-                .setName('canal')
-                .setDescription('elegir un canal para una funcion')
-                .addStringOption((option) =>
-                    option
-                        .setName('funcion')
-                        .setDescription('para que es el canal')
-                        .setRequired(true)
-                        // choices: el usuario solo puede elegir de esta lista
-                        .addChoices(
-                            { name: 'logs', value: 'canal_logs' },
-                            { name: 'bienvenidas', value: 'canal_bienvenida' },
-                            { name: 'sugerencias', value: 'canal_sugerencias' },
-                        ),
-                )
-                .addChannelOption((option) =>
-                    option.setName('canal').setDescription('el canal').setRequired(true).addChannelTypes(ChannelType.GuildText),
-                ),
-        )
-
-        // subcomando: /config ver
-        .addSubcommand((sub) => sub.setName('ver').setDescription('ver la configuracion actual'))
-
-        // subcomando: /config borrar
-        .addSubcommand((sub) =>
-            sub
-                .setName('borrar')
-                .setDescription('borrar un valor de la configuracion')
-                .addStringOption((option) =>
-                    option
-                        .setName('funcion')
-                        .setDescription('que borrar')
-                        .setRequired(true)
-                        .addChoices(
-                            { name: 'logs', value: 'canal_logs' },
-                            { name: 'bienvenidas', value: 'canal_bienvenida' },
-                            { name: 'sugerencias', value: 'canal_sugerencias' },
-                        ),
-                ),
-        ),
+        .setDescription('Configura el bot en tu servidor')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     async execute(interaction) {
-        // que subcomando se uso
-        const sub = interaction.options.getSubcommand();
-        const guildId = interaction.guild.id;
+        const embed = new EmbedBuilder()
+            // color de la barra de la izquierda (hex, nombre, rgb o 'Random')
+            .setColor(0xff3021)
+            
+            const nombrebot = interaction.client.user.username
+            // autor: va arriba de todo, chiquito (name obligatorio, iconURL y url opcionales)
+            .setAuthor({
+                name: nombrebot,
+                iconURL: interaction.user.displayAvatarURL(),
+                url: 'https://discord.js.org',
+            })
 
-        if (sub === 'canal') {
-            const funcion = interaction.options.getString('funcion');
-            const canal = interaction.options.getChannel('canal');
+            // titulo (max 256) y link al hacer click en el titulo
+            .setTitle('titulo del embed')
+            .setURL('https://discord.js.org')
 
-            // guardamos el id del canal en la base de datos
-            guardarConfig(guildId, funcion, canal.id);
+            // texto principal (max 4096), acepta markdown
+            .setDescription('esta es la **descripcion**. acepta *markdown*, `codigo`, [links](https://discord.js.org) y menciones como ' + `${interaction.user}`)
 
-            return interaction.reply({
-                embeds: [embedExito(`\`${funcion}\` ahora es ${canal}`)],
-                flags: MessageFlags.Ephemeral,
-            });
-        }
+            // imagen chica arriba a la derecha
+            .setThumbnail(interaction.guild.iconURL())
 
-        if (sub === 'ver') {
-            const config = todaLaConfig(guildId);
+            // campos: max 25, name max 256, value max 1024
+            // inline: true = se ponen uno al lado del otro (hasta 3 por fila)
+            .addFields(
+                { name: 'campo normal', value: 'ocupa todo el ancho' },
+                { name: 'inline 1', value: 'al lado', inline: true },
+                { name: 'inline 2', value: 'al lado', inline: true },
+                { name: 'inline 3', value: 'al lado', inline: true },
+                // campo vacio para separar ('\u200B' es un caracter invisible)
+                { name: '\u200B', value: '\u200B' },
+                { name: 'otro campo', value: 'despues del espacio' },
+            )
 
-            // los ids de canal los mostramos como mencion (<#id>)
-            const texto = config.length
-                ? config.map(({ clave, valor }) => `**${clave}**: <#${valor}>`).join('\n')
-                : 'no hay nada configurado todavia';
+            // imagen grande abajo
+            .setImage('https://cdn.discordapp.com/embed/avatars/0.png')
 
-            return interaction.reply({ embeds: [embedInfo(texto)], flags: MessageFlags.Ephemeral });
-        }
+            // pie: texto (max 2048) e icono chiquito
+            .setFooter({
+                text: `pedido por ${interaction.user.username}`,
+                iconURL: interaction.user.displayAvatarURL(),
+            })
 
-        if (sub === 'borrar') {
-            const funcion = interaction.options.getString('funcion');
-            borrarConfig(guildId, funcion);
+            // fecha y hora al lado del footer (sin parametro = ahora)
+            .setTimestamp();
 
-            return interaction.reply({ embeds: [embedExito(`\`${funcion}\` borrado`)], flags: MessageFlags.Ephemeral });
-        }
+        // embeds siempre va como array (se pueden mandar hasta 10 juntos)
+        await interaction.reply({ embeds: [embed] });
     },
 };
