@@ -1,5 +1,5 @@
 // /config: guardar y ver la configuracion del servidor (ejemplo de subcomandos + base de datos)
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags, EmbedBuilder} = require('discord.js');
 const { guardarConfig, borrarConfig, todaLaConfig } = require('../../database/config');
 const { embedExito, embedInfo } = require('../../utils/embeds');
 
