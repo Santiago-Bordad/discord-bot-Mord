@@ -2,6 +2,8 @@
 require('dotenv').config();
 // carga el antiCrash (para que no se caiga el bot si hay un error)
 require('./handlers/antiCrash')();
+// carga la base de datos (para que se cree si no existe)
+require('./database/db');
 
 
 // importamos lo que necesitamos de discord.js
