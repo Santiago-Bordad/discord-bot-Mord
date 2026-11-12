@@ -1,18 +1,33 @@
 {
-  "name": "discord-bot",
+  "name": "mord",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "node src/deploy-commands.js",
-    "dev": "node --watch src/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "deploy": "node deploy-commands.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop mord",
+    "pm2:restart": "pm2 restart mord",
+    "pm2:logs": "pm2 logs mord"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/santiagobordad/discord-bot-Mord.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/santiagobordad/discord-bot-Mord/issues"
+  },
+  "homepage": "https://github.com/santiagobordad/discord-bot-Mord#readme",
   "dependencies": {
-    "better-sqlite3": "^13.0.3",
-    "discord.js": "^14.28.1"
+    "better-sqlite3": "^13.1.1",
+    "discord": "^0.8.2",
+    "discord.js": "^14.28.1",
+    "dotenv": "^18.0.10"
   }
 }
