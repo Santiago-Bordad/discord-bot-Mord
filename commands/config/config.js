@@ -13,11 +13,9 @@ module.exports = {
         const embed = new EmbedBuilder()
             // color de la barra de la izquierda (hex, nombre, rgb o 'Random')
             .setColor(0xff3021)
-            
-            const nombrebot = interaction.client.user.username
             // autor: va arriba de todo, chiquito (name obligatorio, iconURL y url opcionales)
             .setAuthor({
-                name: nombrebot,
+                name: interaction.client.user.username,
                 iconURL: interaction.user.displayAvatarURL(),
                 url: 'https://discord.js.org',
             })
