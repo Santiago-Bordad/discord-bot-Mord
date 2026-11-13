@@ -1,5 +1,5 @@
 // /config: guardar y ver la configuracion del servidor (ejemplo de subcomandos + base de datos)
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags, EmbedBuilder} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder} = require('discord.js');
 const { guardarConfig, borrarConfig, todaLaConfig } = require('../../database/config');
 const { embedExito, embedInfo } = require('../../utils/embeds');
 
@@ -14,47 +14,22 @@ module.exports = {
             // color de la barra de la izquierda (hex, nombre, rgb o 'Random')
             .setColor(0xff3021)
             // autor: va arriba de todo, chiquito (name obligatorio, iconURL y url opcionales)
-            .setAuthor({
-                name: interaction.client.user.username,
-                iconURL: interaction.user.displayAvatarURL(),
-                url: 'https://discord.js.org',
-            })
 
             // titulo (max 256) y link al hacer click en el titulo
-            .setTitle('titulo del embed')
-            .setURL('https://discord.js.org')
-
+            .setTitle('Configuracion del bot')
             // texto principal (max 4096), acepta markdown
-            .setDescription('esta es la **descripcion**. acepta *markdown*, `codigo`, [links](https://discord.js.org) y menciones como ' + `${interaction.user}`)
+            .setDescription('Selecciona una opcion del menu para ver o cambiar la configuracion del bot en tu servidor')
 
-            // imagen chica arriba a la derecha
-            .setThumbnail(interaction.guild.iconURL())
-
-            // campos: max 25, name max 256, value max 1024
-            // inline: true = se ponen uno al lado del otro (hasta 3 por fila)
-            .addFields(
-                { name: 'campo normal', value: 'ocupa todo el ancho' },
-                { name: 'inline 1', value: 'al lado', inline: true },
-                { name: 'inline 2', value: 'al lado', inline: true },
-                { name: 'inline 3', value: 'al lado', inline: true },
-                // campo vacio para separar ('\u200B' es un caracter invisible)
-                { name: '\u200B', value: '\u200B' },
-                { name: 'otro campo', value: 'despues del espacio' },
-            )
-
-            // imagen grande abajo
-            .setImage('https://cdn.discordapp.com/embed/avatars/0.png')
-
-            // pie: texto (max 2048) e icono chiquito
-            .setFooter({
-                text: `pedido por ${interaction.user.username}`,
-                iconURL: interaction.user.displayAvatarURL(),
-            })
-
-            // fecha y hora al lado del footer (sin parametro = ahora)
-            .setTimestamp();
+            const menu = new StringSelectMenuBuilder()
+            .setCustomId('config')                 // con esto lo reconoce menus/config.js
+            .setPlaceholder('elegi una opcion')     // texto gris cuando no hay nada elegido
+            .addOptions(
+                { label: 'Bienvenida', value: 'Configura el canal donde se envian las mensajes de bienvenida', emoji: '1️⃣' },
+                { label: 'Logs', value: 'Configura el canal donde se envian los logs', emoji: '2️⃣' },
+                { label: 'Tickets', value: 'Configura el canal donde se gestionan los tickets', emoji: '3️⃣' },
+            );
 
         // embeds siempre va como array (se pueden mandar hasta 10 juntos)
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed], components: [menu] });
     },
 };
